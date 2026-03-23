@@ -2,6 +2,10 @@ import { NextRequest } from 'next/server'
 import { store, Bug } from '@/lib/store'
 import { getScreenshotAbsolutePath } from '@/lib/describe-screenshot'
 import { query } from '@anthropic-ai/claude-agent-sdk'
+import { exec } from 'child_process'
+import { promisify } from 'util'
+
+const execAsync = promisify(exec)
 
 export const runtime = 'nodejs'
 export const dynamic = 'force-dynamic'
@@ -48,6 +52,21 @@ Please find and fix this bug. Make minimal, targeted changes. After fixing, brie
 
     store.updateBug(bug.id, { status: 'done', output: result })
     send({ type: 'bug_done', bugId: bug.id, output: result })
+
+    // Auto-commit and push the fix to the project's git repo
+    try {
+      send({ type: 'progress', bugId: bug.id, message: 'Pushing fix to GitHub...' })
+      const commitMsg = `fix: ${bug.description.slice(0, 72).replace(/"/g, "'")}`
+      await execAsync(
+        `git add -A && git commit -m "${commitMsg}" && git push`,
+        { cwd: projectPath }
+      )
+      send({ type: 'progress', bugId: bug.id, message: 'Pushed to GitHub ✓' })
+    } catch (pushErr) {
+      const pushMsg = pushErr instanceof Error ? pushErr.message : String(pushErr)
+      // Non-fatal — bug is still marked done even if push fails
+      send({ type: 'progress', bugId: bug.id, message: `Git push skipped: ${pushMsg.split('\n')[0]}` })
+    }
   } catch (err) {
     const errMsg = err instanceof Error ? err.message : String(err)
     store.updateBug(bug.id, { status: 'failed', output: errMsg })
