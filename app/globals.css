@@ -1,6 +1,45 @@
 @import "tailwindcss";
 
+:root {
+  --apple-blue: #007AFF;
+  --apple-green: #34C759;
+  --apple-red: #FF3B30;
+  --apple-orange: #FF9500;
+  --apple-gray: #8E8E93;
+  --apple-bg: #F2F2F7;
+  --apple-bg2: #FFFFFF;
+  --apple-separator: rgba(60, 60, 67, 0.13);
+  --apple-label: #000000;
+  --apple-label2: rgba(60, 60, 67, 0.6);
+  --apple-label3: rgba(60, 60, 67, 0.3);
+  --apple-fill: rgba(120, 120, 128, 0.12);
+  --apple-fill2: rgba(120, 120, 128, 0.08);
+}
+
+* {
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
 body {
-  background: #f9fafb;
-  color: #111827;
+  font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Text', 'SF Pro Display',
+    'Helvetica Neue', Arial, sans-serif;
+  background: var(--apple-bg);
+  color: var(--apple-label);
+}
+
+/* Custom scrollbar — macOS style */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+::-webkit-scrollbar-thumb {
+  background: rgba(0, 0, 0, 0.2);
+  border-radius: 3px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: rgba(0, 0, 0, 0.35);
 }
